@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: docker compose build
+
+      # Add any specific testing commands here if you add unit tests in the future
+      # - name: Run Backend Tests
+      #   run: docker compose run backend pytest
+      
+      # - name: Run Frontend Tests
+      #   run: docker compose run frontend npm test
+
+  deploy:
+    name: Deploy to Server
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy project files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "."
+          target: "/opt/task-manager" # Change this to your server's deployment directory
+
+      - name: Start Docker Compose on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/task-manager
+            
+            # Write production environment variables from GitHub Secrets
+            echo "${{ secrets.PROD_ENV_FILE }}" > .env
+            
+            # Rebuild and restart the containers in detached mode
+            docker compose down
+            docker compose up -d --build
