@@ -1,0 +1,15 @@
+# Ignore node dependencies
+node_modules/
+npm-debug.log
+
+# Ignore build artifacts
+dist/
+build/
+
+# Ignore Git
+.git
+.gitignore
+
+# Ignore Docker related files
+Dockerfile
+.dockerignore

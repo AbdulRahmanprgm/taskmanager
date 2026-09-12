@@ -1,0 +1,22 @@
+# Ignore Python cache and virtual environment
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore Git
+.git
+.gitignore
+
+# Ignore local environment file
+.env
+.env.*
+
+# Ignore Docker related files
+Dockerfile
+.dockerignore
